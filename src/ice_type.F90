@@ -105,6 +105,7 @@ type ice_data_type !  ice_public_type
     runoff => NULL(), &   !< Liquid runoff into the ocean [kg m-2].
     calving => NULL(), &  !< Calving of ice or runoff of frozen fresh water into
                           !! the ocean [kg m-2].
+    basal => NULL(), &    !< Liquid melt from ice shelf cavities [kg m-2]. Used with PIK_basal routine. 
     stress_mag => NULL(), & !< The time-mean magnitude of the stress on the ocean [Pa].
     ustar_berg => NULL(), &  !< ustar contribution below icebergs [m s-1]
     area_berg => NULL(),  &  !< fraction of grid cell covered by icebergs in [m2 m-2]
@@ -115,6 +116,8 @@ type ice_data_type !  ice_public_type
     calving_hflx => NULL(), & !< The heat flux associated with calving, based on
                               !! the temperature difference relative to a
                               !! reference temperature, in ???.
+    basal_hflx => NULL(), &   !< The heat flux associated with liquid melt 
+                              !! from ice shelf cavities [kg m-2]. Used with PIK_basal routine.
     flux_salt  => NULL()  !< The flux of salt out of the ocean [kg m-2].
 
   real, pointer, dimension(:,:) :: &
