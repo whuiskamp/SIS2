@@ -1835,7 +1835,11 @@ subroutine ice_model_init(Ice, Time_Init, Time, Time_step_fast, Time_step_slow, 
                  "returned to the coupler.  Valid values include "//&
                  "'A', 'B', or 'C', with a default that follows the "//&
                  "value of CGRID_ICE_DYNAMICS.", default=dflt_stagger)
-
+  ! PIK_basal option
+  call get_param(param_file, mdl, "PIK_basal", PIK_basal, &
+                 "If true, fluxes for mass and energy associated "//&
+                 "with the melting of ice shelves via interaction " //&
+                 "with the ocean are included", default=.false.)
   ! Rho_ocean is not actually used here, but it used from later get_param
   ! calls in other modules.  This call is here to avoid changing the order of
   ! the entries in the SIS_parameter_doc files.
@@ -2042,6 +2046,8 @@ subroutine ice_model_init(Ice, Time_Init, Time, Time_step_fast, Time_step_slow, 
     Ice%sCS%redo_fast_update = redo_fast_update
     Ice%sCS%bounds_check = bounds_check
     Ice%sCS%debug = debug_slow
+    ! PIK_basal
+    Ice%sCS%PIK_basal = PIK_basal
 
     ! Set up the ice-specific grid describing categories and ice layers.
     call set_ice_grid(sIG, US, param_file, nCat_dflt, ocean_part_min_dflt=opm_dflt)

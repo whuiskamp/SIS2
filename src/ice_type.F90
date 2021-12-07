@@ -210,6 +210,11 @@ subroutine ice_type_slow_reg_restarts(domain, CatIce, param_file, Ice, &
   call safe_alloc_ptr(Ice%area, isc, iec, jsc, jec)
   call safe_alloc_ptr(Ice%mi, isc, iec, jsc, jec)  !NR
 
+  if (Ice%sCS%PIK_basal) then
+    call safe_alloc_ptr(Ice%basal, isc, iec, jsc, jec)
+    call safe_alloc_ptr(Ice%basal_hflx, isc, iec, jsc, jec)
+  endif
+
   if (Ice%sCS%pass_stress_mag) then
     call safe_alloc_ptr(Ice%stress_mag, isc, iec, jsc, jec)
   endif
