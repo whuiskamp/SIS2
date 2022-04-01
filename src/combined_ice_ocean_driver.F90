@@ -120,12 +120,6 @@ subroutine ice_ocean_driver_init(CS, Time_init, Time_in)
                  "The time step for coupling the ice and ocean dynamics when "//&
                  "INTERSPERSE_ICE_OCEAN is true, or <0 to use the coupled timestep.", &
                  units="seconds", default=-1.0, do_not_log=.not.CS%intersperse_ice_ocn)
-  !PIK_basal
-  call get_param(param_file, mdl, "PIK_basal", CS%PIK_basal, &
-                 "Option to turn on the inclusion of sub-ice shelf melt in MOM6"//&
-                 "PIK_basal is false by default, set to true for inclusion of mass and energy fluxes", &
-                 default=-.false.)
-
 !  OS%is_ocean_pe = Ocean_sfc%is_ocean_pe
 !  if (.not.OS%is_ocean_pe) return
 
@@ -196,7 +190,7 @@ subroutine update_slow_ice_and_ocean(CS, Ice, Ocn, Ocean_sfc, IOB, &
     ! First step the ice, then ocean thermodynamics.
     call update_ice_slow_thermo(Ice)
 
-    call direct_flux_ice_to_IOB(time_start_update, Ice, IOB, do_thermo=.true.,CS%PIK_basal)
+    call direct_flux_ice_to_IOB(time_start_update, Ice, IOB, do_thermo=.true.)
 
     call update_ocean_model(IOB, Ocn, Ocean_sfc, time_start_update, coupling_time_step, &
                             update_dyn=.false., update_thermo=.true., &
@@ -217,7 +211,7 @@ subroutine update_slow_ice_and_ocean(CS, Ice, Ocn, Ocean_sfc, IOB, &
       call update_ice_dynamics_trans(Ice, time_step=dyn_time_step, &
                         start_cycle=(ns==1), end_cycle=(ns==nstep), cycle_length=dt_coupling)
 
-      call direct_flux_ice_to_IOB(time_start_step, Ice, IOB, do_thermo=.false.,CS%PIK_basal)
+      call direct_flux_ice_to_IOB(time_start_step, Ice, IOB, do_thermo=.false.)
 
       call update_ocean_model(IOB, Ocn, Ocean_sfc, time_start_step, dyn_time_step, &
                               update_dyn=.true., update_thermo=.false., &
@@ -229,7 +223,7 @@ subroutine update_slow_ice_and_ocean(CS, Ice, Ocn, Ocean_sfc, IOB, &
 
     call update_ice_dynamics_trans(Ice)
 
-    call direct_flux_ice_to_IOB(time_start_update, Ice, IOB,CS%PIK_basal)
+    call direct_flux_ice_to_IOB(time_start_update, Ice, IOB)
 
     if (CS%single_MOM_call) then
       call update_ocean_model(IOB, Ocn, Ocean_sfc, time_start_update, coupling_time_step )
@@ -248,7 +242,7 @@ end subroutine update_slow_ice_and_ocean
 
 !> This subroutine does a direct copy of the fluxes from the ice data type into
 !! a ice-ocean boundary type on the same grid.
-subroutine direct_flux_ice_to_IOB(Time, Ice, IOB, do_thermo, PIK_basal)
+subroutine direct_flux_ice_to_IOB(Time, Ice, IOB, do_thermo)
   type(time_type),    intent(in)    :: Time !< Current time
   type(ice_data_type),intent(in)    :: Ice  !< A derived data type to specify ice boundary data
   type(ice_ocean_boundary_type), &
@@ -256,8 +250,6 @@ subroutine direct_flux_ice_to_IOB(Time, Ice, IOB, do_thermo, PIK_basal)
                                             !! and fluxes passed from ice to ocean
   logical,  optional, intent(in)    :: do_thermo !< If present and false, do not update the
                                             !! thermodynamic or tracer fluxes.
-  logical,  optional, intent(in)    :: PIK_basal !< If true, read in fields for basal melt
-
   integer :: i, j, is, ie, js, je, i_off, j_off, n, m
   logical :: used, do_therm
 
@@ -292,11 +284,7 @@ subroutine direct_flux_ice_to_IOB(Time, Ice, IOB, do_thermo, PIK_basal)
     if (ASSOCIATED(IOB%runoff_hflx)) IOB%runoff_hflx(:,:) = Ice%runoff_hflx(:,:)
     if (ASSOCIATED(IOB%calving_hflx)) IOB%calving_hflx(:,:) = Ice%calving_hflx(:,:)
     if (ASSOCIATED(IOB%q_flux)) IOB%q_flux(:,:) = Ice%flux_q(:,:)
-    if (PIK_basal) then
-      if (ASSOCIATED(IOB%basal)) IOB%basal(:,:) = Ice%basal(:,:)
-      if (ASSOCIATED(IOB%basal)) IOB%basal_hflx(:,:) = Ice%basal_hflx(:,:)
-    endif
-
+   
     ! Extra fluxes
     call coupler_type_copy_data(Ice%ocean_fluxes, IOB%fluxes)
   endif
@@ -319,6 +307,11 @@ subroutine direct_flux_ice_to_IOB(Time, Ice, IOB, do_thermo, PIK_basal)
     call data_override('OCN', 'calving',   IOB%calving  , Time)
     call data_override('OCN', 'runoff_hflx',  IOB%runoff_hflx   , Time)
     call data_override('OCN', 'calving_hflx', IOB%calving_hflx  , Time)
+  endif
+  ! PIK_basal
+  if (ASSOCIATED(IOB%basal)) then
+    call data_override('OCN', 'basal',      IOB%basal,      Time)
+    call data_override('OCN', 'basal_hflx', IOB%basal_hflx, Time)
   endif
   call data_override('OCN', 'p',         IOB%p        , Time)
   call data_override('OCN', 'mi',        IOB%mi       , Time)
