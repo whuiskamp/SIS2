@@ -114,6 +114,7 @@ type SIS_slow_CS
   logical :: bounds_check   !< If true, check for sensible values of thicknesses
                             !! temperatures, fluxes, etc.
   logical :: debug          !< If true, write verbose checksums for debugging purposes.
+  logical :: PIK_basal      !< If true, sub-shelf melt and heatflux files are read in
 
 !  type(SIS_tracer_registry_type), pointer :: TrReg => NULL()
 
