@@ -1762,6 +1762,7 @@ subroutine ice_model_init(Ice, Time_Init, Time, Time_step_fast, Time_step_slow, 
                               ! after a restart.Provide a switch to turn this option off.
   logical :: recategorize_ice ! If true, adjust the distribution of the ice among thickness
                               ! categories after initialiation.
+  logical :: PIK_basal        ! If true, sub-shelf melt and energy fluxes are added to ocean.
   logical :: Verona
   logical :: Concurrent
   logical :: read_aux_restart
