@@ -312,6 +312,8 @@ subroutine direct_flux_ice_to_IOB(Time, Ice, IOB, do_thermo)
   if (ASSOCIATED(IOB%basal)) then
     call data_override('OCN', 'basal',      IOB%basal,      Time)
     call data_override('OCN', 'basal_hflx', IOB%basal_hflx, Time)
+    call MOM_error(WARNING, "ice_ocean_driver_init successfully "// &
+                    "read in fields for basal melt and heat flux")
   endif
   call data_override('OCN', 'p',         IOB%p        , Time)
   call data_override('OCN', 'mi',        IOB%mi       , Time)

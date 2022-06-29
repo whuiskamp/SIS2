@@ -364,6 +364,9 @@ subroutine dealloc_Ice_arrays(Ice)
   if (associated(Ice%area_berg)) deallocate(Ice%area_berg)
   if (associated(Ice%mass_berg)) deallocate(Ice%mass_berg)
 
+  if (associated(Ice%basal)) deallocate(Ice%basal)
+  if (associated(Ice%basal_hflx)) deallocate(Ice%basal_hflx)
+
 end subroutine dealloc_Ice_arrays
 
 !~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~!
